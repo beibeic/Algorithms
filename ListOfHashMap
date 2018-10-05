@@ -1,0 +1,85 @@
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class ArrayOfHashMap {
+    public static Map<String, Integer>  minByKey(String key, List<Map<String, Integer>> records)
+    {
+        if(records.size() == 0)
+            return new HashMap<>() ;
+        List<Map<String, Integer>> filtered = records.parallelStream().filter(a->a.containsKey(key)).collect(Collectors.toList());
+
+        filtered.sort((p1, p2)->p1.get(key).compareTo(p2.get(key)));
+        if(filtered.size() == 0)
+            return new HashMap<>() ;
+        return filtered.get(0);
+
+    }
+    public static Map<String, Integer> resultByKey(String key, boolean order,  List<Map<String, Integer>> records)
+    {
+        if(records.size() == 0)
+            return new HashMap<>() ;
+        List<Map<String, Integer>> filtered = records.parallelStream().filter(a->a.containsKey(key)).collect(Collectors.toList());
+        filtered.sort((p1, p2)->p1.get(key).compareTo(p2.get(key)));
+        if(filtered.size() == 0)
+            return new HashMap<>() ;
+        return order? filtered.get(0) : filtered.get(filtered.size()-1);
+    }
+    public static Map<String, Integer> resultByKey2(String key, boolean order,  List<Map<String, Integer>> records)
+    {
+        if(records.size() == 0)
+            return new HashMap<>() ;
+        List<Map<String, Integer>> filtered = records.parallelStream().filter(a->a.containsKey(key)).collect(Collectors.toList());
+        Collections.sort(filtered, new Comparator<Map<String, Integer>>(){public int compare (Map<String, Integer> map1, Map<String, Integer> map2){return map1.get(key).compareTo(map2.get(key));}} );
+        if(filtered.size() == 0)
+            return new HashMap<>() ;
+        return order? filtered.get(0) : filtered.get(filtered.size()-1);
+    }
+
+    public  static  List<Map<String, Integer>> resultByKey4(String key, boolean order,  List<Map<String, Integer>> records)
+    {
+        if(records.size() == 0)
+            return new LinkedList<>();
+        List<Map<String, Integer>> filtered = records.parallelStream().filter(a->a.containsKey(key)).collect(Collectors.toList());
+        Collections.sort(filtered, new Comparator<Map<String, Integer>>(){public int compare (Map<String, Integer> map1, Map<String, Integer> map2){return map1.get(key).compareTo(map2.get(key));}} );
+        if(filtered.size() == 0)
+            return new LinkedList<>() ;
+        int value = order? filtered.get(0).get(key) : filtered.get(filtered.size() -1).get(key);
+        return filtered.parallelStream().filter(a->a.get(key)==value).collect(Collectors.toList());
+
+    }
+    public static Map<String, Integer> resultByKey3(String[][] orderedKey, List<Map<String, Integer>> records)
+    {
+        for ( String[] order: orderedKey
+             ) {
+            String key = order[0];
+            boolean o = order[1] == "asc" ? true:false;
+            records = resultByKey4( key, o, records);
+            if(records.size() == 0)
+                return  new HashMap<>();
+            else if(records.size()==1)
+                return records.get(0);
+
+        }
+        return  new HashMap<>();
+    }
+
+    /*
+    public static void main(String[] args) {
+        Map<String, Integer> map1 = new HashMap<>();
+       // map1.put("a", 1);
+       // map1.put("b", -1);
+        Map<String, Integer> map2 = new HashMap<>();
+        //map2.put("b", -2);
+        //map2.put("b", -2);
+        //map2.put("b", -2);
+        List<Map<String, Integer>> lists = new LinkedList<>();
+        lists.add(map1);
+        lists.add(map2);
+        Map<String, Integer> res = minByKey("b", lists);
+        Map<String, Integer> res2 = resultByKey("b", true, lists);
+        Map<String, Integer> res3 = resultByKey("b", false, lists);
+        Map<String, Integer> res4 = resultByKey2("b", true, lists);
+        Map<String, Integer> res5 = resultByKey2("b", false, lists);
+
+    }
+*/
